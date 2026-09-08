@@ -7,6 +7,7 @@ import TripsListPage from "./trips/TripsListPage";
 import TripDetailPage from "./trips/TripDetailPage";
 import ItineraryPage from "./itinerary/ItineraryPage";
 import AcceptInvitePage from "./trips/AcceptInvitePage";
+import ExpensesPage from "./expenses/ExpensesPage";
 
 export default function App() {
   return (
@@ -44,6 +45,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <AcceptInvitePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/trips/:tripId/expenses"
+            element={
+              <RequireAuth>
+                <ExpensesPage />
               </RequireAuth>
             }
           />

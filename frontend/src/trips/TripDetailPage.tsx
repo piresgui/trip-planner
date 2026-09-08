@@ -59,6 +59,9 @@ export default function TripDetailPage() {
       </ul>
 
       <button onClick={() => navigate(`/trips/${tripId}/itinerary`)}>View itinerary</button>
+      <button onClick={() => navigate(`/trips/${tripId}/expenses`)} style={{ marginLeft: 8 }}>
+        View expenses
+      </button>
 
       {canEdit && tripId && <InvitePanel tripId={tripId} />}
     </div>
