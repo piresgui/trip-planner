@@ -42,6 +42,8 @@ class ItineraryServiceTest {
     private TripRepository tripRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ItineraryBroadcaster broadcaster;
 
     @InjectMocks
     private ItineraryService itineraryService;

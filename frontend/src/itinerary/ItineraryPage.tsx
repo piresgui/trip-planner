@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { addActivity, addDay, deleteActivity, listDays } from "./api";
 import { ItineraryDay } from "./types";
+import { useTripSocket } from "../api/useTripSocket";
 
 export default function ItineraryPage() {
   const { tripId } = useParams<{ tripId: string }>();
@@ -16,6 +17,14 @@ export default function ItineraryPage() {
   useEffect(() => {
     refresh();
   }, [tripId]);
+
+  // Any collaborator's create/update/delete of an activity is broadcast over
+  // WebSocket; simplest correct handling here is to just re-fetch the day
+  // list rather than hand-patch local state, which keeps this component in
+  // sync with the server without duplicating the merge logic client-side.
+  useTripSocket(tripId, () => {
+    refresh();
+  });
 
   async function handleAddDay(e: FormEvent) {
     e.preventDefault();

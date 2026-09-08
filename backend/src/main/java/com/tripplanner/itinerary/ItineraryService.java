@@ -23,15 +23,18 @@ public class ItineraryService {
     private final ActivityRepository activityRepository;
     private final TripRepository tripRepository;
     private final UserRepository userRepository;
+    private final ItineraryBroadcaster broadcaster;
 
     public ItineraryService(ItineraryDayRepository dayRepository,
                              ActivityRepository activityRepository,
                              TripRepository tripRepository,
-                             UserRepository userRepository) {
+                             UserRepository userRepository,
+                             ItineraryBroadcaster broadcaster) {
         this.dayRepository = dayRepository;
         this.activityRepository = activityRepository;
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
+        this.broadcaster = broadcaster;
     }
 
     @Transactional(readOnly = true)
@@ -68,7 +71,9 @@ public class ItineraryService {
                 .createdBy(creator)
                 .build();
         activity = activityRepository.save(activity);
-        return ActivityResponse.from(activity);
+        ActivityResponse response = ActivityResponse.from(activity);
+        broadcaster.activityCreated(tripId, response);
+        return response;
     }
 
     @Transactional
@@ -81,7 +86,9 @@ public class ItineraryService {
         activity.setDescription(request.description());
         activity.setEstimatedCost(request.estimatedCost());
         activity = activityRepository.save(activity);
-        return ActivityResponse.from(activity);
+        ActivityResponse response = ActivityResponse.from(activity);
+        broadcaster.activityUpdated(tripId, response);
+        return response;
     }
 
     @Transactional
@@ -90,6 +97,7 @@ public class ItineraryService {
         Activity activity = activityRepository.findByIdAndItineraryDayId(activityId, dayId)
                 .orElseThrow(() -> ApiException.notFound("Activity not found"));
         activityRepository.delete(activity);
+        broadcaster.activityDeleted(tripId, dayId, activityId);
     }
 
     private List<ActivityResponse> listActivities(UUID dayId) {
