@@ -4,6 +4,7 @@ import RequireAuth from "./auth/RequireAuth";
 import LoginPage from "./auth/LoginPage";
 import RegisterPage from "./auth/RegisterPage";
 import TripsListPage from "./trips/TripsListPage";
+import TripDetailPage from "./trips/TripDetailPage";
 
 export default function App() {
   return (
@@ -17,6 +18,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <TripsListPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/trips/:tripId"
+            element={
+              <RequireAuth>
+                <TripDetailPage />
               </RequireAuth>
             }
           />
