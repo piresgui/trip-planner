@@ -6,6 +6,7 @@ import RegisterPage from "./auth/RegisterPage";
 import TripsListPage from "./trips/TripsListPage";
 import TripDetailPage from "./trips/TripDetailPage";
 import ItineraryPage from "./itinerary/ItineraryPage";
+import AcceptInvitePage from "./trips/AcceptInvitePage";
 
 export default function App() {
   return (
@@ -35,6 +36,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <ItineraryPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/invites/:token"
+            element={
+              <RequireAuth>
+                <AcceptInvitePage />
               </RequireAuth>
             }
           />

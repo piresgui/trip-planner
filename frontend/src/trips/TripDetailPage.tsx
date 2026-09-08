@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getTrip, listParticipants, updateTrip, TripInput } from "./api";
 import { Participant, Trip } from "./types";
 import TripForm from "./TripForm";
+import InvitePanel from "./InvitePanel";
 
 export default function TripDetailPage() {
   const { tripId } = useParams<{ tripId: string }>();
@@ -58,6 +59,8 @@ export default function TripDetailPage() {
       </ul>
 
       <button onClick={() => navigate(`/trips/${tripId}/itinerary`)}>View itinerary</button>
+
+      {canEdit && tripId && <InvitePanel tripId={tripId} />}
     </div>
   );
 }
