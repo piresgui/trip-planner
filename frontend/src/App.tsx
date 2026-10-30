@@ -1,64 +1,18 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { AuthProvider } from "./auth/AuthContext";
-import RequireAuth from "./auth/RequireAuth";
-import LoginPage from "./auth/LoginPage";
-import RegisterPage from "./auth/RegisterPage";
-import TripsListPage from "./trips/TripsListPage";
-import TripDetailPage from "./trips/TripDetailPage";
-import ItineraryPage from "./itinerary/ItineraryPage";
-import AcceptInvitePage from "./trips/AcceptInvitePage";
-import ExpensesPage from "./expenses/ExpensesPage";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import TripsPage from "./pages/TripsPage";
+import TripPage from "./pages/TripPage";
+import Toaster from "./components/Toaster";
 
+// HashRouter: funciona até abrindo o build direto do disco, sem servidor.
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/trips"
-            element={
-              <RequireAuth>
-                <TripsListPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/trips/:tripId"
-            element={
-              <RequireAuth>
-                <TripDetailPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/trips/:tripId/itinerary"
-            element={
-              <RequireAuth>
-                <ItineraryPage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/invites/:token"
-            element={
-              <RequireAuth>
-                <AcceptInvitePage />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/trips/:tripId/expenses"
-            element={
-              <RequireAuth>
-                <ExpensesPage />
-              </RequireAuth>
-            }
-          />
-          <Route path="*" element={<Navigate to="/trips" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<TripsPage />} />
+        <Route path="/trips/:tripId" element={<TripPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Toaster />
+    </HashRouter>
   );
 }

@@ -1,95 +1,53 @@
-# Collab Trip Planner
+# Trip Planner
 
-A collaborative trip planning application where users can create trips, build shared itineraries, invite other participants, and see updates in real time as the group plans together.
+Planejador de viagens **100% local**: nada de servidor, banco de dados ou hospedagem paga. Os dados ficam salvos no navegador (localStorage) e você pode exportar e importar backups em JSON.
 
-This project was built as a portfolio project to practice backend architecture, authentication, real-time communication, and full-stack integration.
+## Funcionalidades
 
-## Features
+- **Viagens**: crie, edite, duplique como modelo e exclua viagens (destino, datas, moeda, orçamento, ícone e cor).
+- **Roteiro em quadro (estilo kanban)**: uma coluna por dia e mais um banco de **ideias** sem data.
+  - Arraste e solte atividades entre os dias e reordene dentro do mesmo dia.
+  - Adição rápida: digite `14h Museu do Prado` e o horário já é preenchido; a categoria é sugerida automaticamente.
+  - Filtro por categoria, custo por dia, botão para organizar o dia por horário e link do local no Google Maps.
+- **Visão geral**: contagem regressiva, progresso do planejamento, resumo dia a dia, próximos passos sugeridos e o que vem a seguir.
+- **Gastos**: orçamento × gasto × previsto, divisão entre os viajantes, saldos e o **mínimo de transferências** para acertar as contas, além do gasto por categoria.
+- **Checklist da mala**: grupos, itens básicos prontos e progresso.
+- **Notas** com salvamento automático.
+- **Desfazer** (`Ctrl+Z` ou o botão nas notificações), impressão do roteiro, tema claro/escuro automático e layout responsivo.
+- **Backup**: exporte tudo ou uma única viagem em `.json` e importe depois.
 
-- User registration and login with JWT-based authentication
-- Create, edit, and delete trips (destination, dates, participants)
-- Day-by-day itinerary with activities (time, location, estimated cost)
-- Invite other users to collaborate on a trip
-- Real-time itinerary updates via WebSocket — all participants see changes instantly
-- Shared expense tracking with per-participant balance calculation
+## Como rodar
 
-## Tech Stack
-
-**Backend**
-- Java 17
-- Spring Boot 3
-- Spring Data JPA
-- Spring Security (JWT authentication)
-- WebSocket (STOMP) for real-time sync
-- PostgreSQL
-- JUnit + Mockito for testing
-
-**Frontend**
-- React
-- TypeScript
-- Axios for API communication
-
-**Infrastructure**
-- Docker & Docker Compose
-
-## Architecture
-
-The project follows a standard layered architecture on the backend (controller → service → repository) with clear separation between the REST API and the WebSocket layer used for real-time itinerary updates. The data model centers around `User`, `Trip`, `Itinerary`, `Activity`, and `Expense` entities, with a many-to-many relationship between users and trips to support collaboration.
-
-```
-collab-trip-planner/
-├── backend/
-│   ├── src/main/java/...
-│   └── src/test/java/...
-├── frontend/
-│   ├── src/
-│   └── ...
-└── docker-compose.yml
-```
-
-## Getting Started
-
-### Prerequisites
-- Java 17+
-- Node.js 18+
-- Docker and Docker Compose
-
-### Running locally
+Pré-requisito: Node.js 18+.
 
 ```bash
-# Clone the repository
-git clone https://github.com/piresgui/collab-trip-planner.git
-cd collab-trip-planner
-
-# Start the database
-docker-compose up -d
-
-# Run the backend
-cd backend
-./mvnw spring-boot:run
-
-# Run the frontend
-cd ../frontend
+cd frontend
 npm install
-npm start
+npm run dev
 ```
 
-The API will be available at `http://localhost:8080` and the frontend at `http://localhost:3000`.
+O app abre em http://localhost:5173.
 
-## Testing
+> ⚠️ Se a pasta estiver no Google Drive/OneDrive, o `npm install` pode falhar com `EBADF`. Copie o projeto para uma pasta local (ex.: `C:\dev\trip-planner`) para instalar e rodar.
 
-Backend unit and integration tests can be run with:
+### Versão para abrir sem servidor
 
 ```bash
-cd backend
-./mvnw test
+cd frontend
+npm run build
 ```
 
-## Development Notes
+Depois é só abrir `frontend/dist/index.html` no navegador. Os dados ficam salvos por navegador e por endereço; use **Backup/Importar** para levar suas viagens para outro lugar.
 
-The application logic, architecture decisions, and code were developed by me as a learning project. Claude Code was used only as a support tool for git commit messages and repository organization — not for generating the application's business logic or architecture.
+## Stack
 
-## Author
+React 18 · TypeScript · Vite · React Router, com CSS próprio (sem bibliotecas de UI).
 
-Guilherme Pires
-[GitHub](https://github.com/piresgui) · [LinkedIn](https://www.linkedin.com/in/guilherme-pires-608909233/)
+```
+frontend/src/
+├── store.ts          # estado, persistência local, desfazer e notificações
+├── types.ts / utils.ts
+├── pages/            # lista de viagens e página da viagem
+├── tabs/             # Visão geral, Roteiro, Gastos, Checklist, Notas
+└── components/       # modais e campos reutilizáveis
+```
