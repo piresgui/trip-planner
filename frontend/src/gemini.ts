@@ -1,3 +1,4 @@
+import { today } from "./utils";
 import type { AiOption, AiResult, TransportPlan } from "./types";
 
 /**
@@ -26,7 +27,7 @@ export function setApiKey(key: string) {
 
 function buildPrompt(p: TransportPlan): string {
   const trip = p.oneWay || !p.returnDate ? `somente ida em ${p.departDate}` : `ida em ${p.departDate} e volta em ${p.returnDate}`;
-  return `Você é um assistente de viagens no Brasil. Pesquise na web as opções MAIS BARATAS de transporte de "${p.origin}" para "${p.destination}", ${trip}, para ${p.passengers} passageiro(s).
+  return `Hoje é ${today()}. Você é um assistente de viagens no Brasil. Pesquise na web as opções MAIS BARATAS de transporte de "${p.origin}" para "${p.destination}", ${trip}, para ${p.passengers} passageiro(s).
 
 Considere:
 - Voos: Google Flights, Decolar, Skyscanner, Kayak e os sites das companhias (LATAM, GOL, Azul, e internacionais se for o caso), incluindo aeroportos próximos à origem e ao destino.
@@ -50,7 +51,7 @@ Responda APENAS com um bloco \`\`\`json contendo:
   ],
   "tips": ["dicas específicas desta rota e destas datas para economizar"]
 }
-Ordene "options" do mais barato para o mais caro e traga de 4 a 10 opções, misturando avião e ônibus quando fizer sentido. Use apenas preços que você encontrou na pesquisa; se forem estimativas, deixe claro em "price". Não invente links: se não tiver a página exata, use a página de busca do site.`;
+Ordene "options" do mais barato para o mais caro e traga de 4 a 10 opções, misturando avião e ônibus quando fizer sentido. Use apenas preços que você encontrou na pesquisa; se forem estimativas, deixe claro em "price". Escreva texto puro, sem markdown. Não invente links: se não tiver a página exata, use a página de busca do site.`;
 }
 
 interface GeminiResponse {
@@ -116,9 +117,9 @@ export async function searchWithGemini(p: TransportPlan, apiKey: string, signal?
 
   return {
     at: Date.now(),
-    summary: String(parsed.summary ?? ""),
+    summary: String(parsed.summary ?? "").replace(/\*\*|__/g, ""),
     options,
-    tips: (Array.isArray(parsed.tips) ? parsed.tips : []).map(String),
+    tips: (Array.isArray(parsed.tips) ? parsed.tips : []).map((t) => String(t).replace(/\*\*|__/g, "")),
     sources,
   };
 }

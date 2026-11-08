@@ -170,7 +170,7 @@ export default function Tickets({ trip }: { trip: Trip }) {
               </div>
             )}
 
-            {loading && <div className="ai-loading"><span className="spinner" /> Pesquisando voos e ônibus… pode levar uns 20 segundos.</div>}
+            {loading && <div className="ai-loading"><span className="spinner" /> Pesquisando voos e ônibus… pode levar até 1 minuto.</div>}
             {error && <p className="bad small">⚠️ {error}</p>}
 
             {ai && !loading && (
