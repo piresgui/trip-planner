@@ -412,3 +412,23 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--good); c
   .column { break-inside: avoid; max-height: none; background: none; border: 1px solid #ccc; margin-bottom: 10px; }
   .card { box-shadow: none; }
 }
+
+/* ---------- Descobrir destinos ---------- */
+.discover .wish { width: 100%; margin: 12px 0 10px; font-size: .95rem; }
+.discover .chips { margin-bottom: 10px; }
+.discover .chip { text-align: left; }
+.dest-list { display: flex; flex-direction: column; gap: 10px; }
+.dest { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.dest.open { border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); }
+.dest-head { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 0; background: var(--surface); cursor: pointer; text-align: left; }
+.dest-head:hover { background: var(--surface-2); }
+.dest-head small { display: block; margin-top: 2px; }
+.dest-emoji { font-size: 1.8rem; }
+.dest-modes { display: flex; gap: 4px; font-size: 1.1rem; }
+.dest-price { font-size: .82rem; color: var(--muted); white-space: nowrap; }
+.dest-price b { color: var(--good); }
+.dest-body { padding: 4px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 600px) {
+  .dest-head { flex-wrap: wrap; }
+  .dest-price { width: 100%; padding-left: 46px; }
+}

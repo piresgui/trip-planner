@@ -32,7 +32,7 @@ export interface ChecklistItem {
 }
 
 export interface AiOption {
-  mode: "aviao" | "onibus" | "outro";
+  mode: "aviao" | "onibus" | "carro" | "outro";
   company: string;
   route: string;
   price: string;
@@ -50,6 +50,25 @@ export interface AiResult {
   sources: { title: string; uri: string }[];
 }
 
+export interface Destination {
+  name: string;
+  emoji: string;
+  why: string;
+  highlights: string[];
+  bestTime: string;
+  estimatedTotal: string;
+  options: AiOption[];
+}
+
+export interface DiscoverResult {
+  at: number;
+  wish: string;
+  summary: string;
+  destinations: Destination[];
+  tips: string[];
+  sources: { title: string; uri: string }[];
+}
+
 export interface TransportPlan {
   origin: string;
   destination: string;
@@ -58,6 +77,8 @@ export interface TransportPlan {
   oneWay: boolean;
   passengers: number;
   ai?: AiResult;
+  wish?: string;
+  discover?: DiscoverResult;
 }
 
 export interface Trip {

@@ -2,10 +2,11 @@ import { useMemo, useRef, useState } from "react";
 import { toast, updateTrip } from "../store";
 import type { AiOption, Trip, TransportPlan } from "../types";
 import { buildLinks, TIPS, toIata } from "../links";
-import { getApiKey, searchWithGemini, setApiKey } from "../gemini";
+import { getApiKey, searchWithGemini } from "../gemini";
+import ApiKeyBox from "../components/ApiKeyBox";
+import Discover, { MODE_ICON } from "./Discover";
 import { money, uid } from "../utils";
 
-const MODE_ICON: Record<AiOption["mode"], string> = { aviao: "✈️", onibus: "🚌", outro: "🚗" };
 
 function defaults(trip: Trip): TransportPlan {
   return {
@@ -21,7 +22,6 @@ function defaults(trip: Trip): TransportPlan {
 export default function Tickets({ trip }: { trip: Trip }) {
   const plan = trip.transport ?? defaults(trip);
   const [key, setKey] = useState(getApiKey);
-  const [keyDraft, setKeyDraft] = useState("");
   const [showKey, setShowKey] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -53,14 +53,7 @@ export default function Tickets({ trip }: { trip: Trip }) {
     }
   }
 
-  function saveKey() {
-    setApiKey(keyDraft);
-    setKey(keyDraft.trim());
-    setKeyDraft("");
-    setShowKey(false);
-  }
-
-  function addToItinerary(o: AiOption) {
+  function addToItinerary(o: AiOption, place = plan.destination) {
     const date = plan.departDate;
     updateTrip(trip.id, (t) => {
       const order = Math.max(-1, ...t.activities.filter((a) => a.date === date).map((a) => a.order)) + 1;
@@ -73,7 +66,7 @@ export default function Tickets({ trip }: { trip: Trip }) {
             date: date >= t.startDate && date <= t.endDate ? date : null,
             order,
             time: "",
-            title: `${MODE_ICON[o.mode]} ${o.company} · ${o.route}`.trim(),
+            title: `${MODE_ICON[o.mode]} ${o.company} · ${o.route || place}`.trim(),
             location: plan.origin,
             notes: [o.price, o.duration, o.details, o.url].filter(Boolean).join("\n"),
             cost: o.priceValue * plan.passengers,
@@ -103,7 +96,7 @@ export default function Tickets({ trip }: { trip: Trip }) {
             <button type="button" className="icon-btn swap" title="Inverter origem e destino" onClick={() => set({ origin: plan.destination, destination: plan.origin })}>⇄</button>
             <label>
               Destino
-              <input value={plan.destination} onChange={(e) => set({ destination: e.target.value })} placeholder="São Paulo, SP  ou  GRU" />
+              <input value={plan.destination} onChange={(e) => set({ destination: e.target.value })} placeholder="Vazio = a IA sugere destinos" />
             </label>
           </div>
           <div className="row">
@@ -132,12 +125,14 @@ export default function Tickets({ trip }: { trip: Trip }) {
         </form>
       </section>
 
-      {!ready ? (
+      {!plan.origin.trim() ? (
         <div className="empty">
           <div className="empty-emoji">🎫</div>
-          <p className="muted">Preencha a origem para ver os links de busca de voos e ônibus.</p>
+          <p className="muted">Preencha a origem. Com o destino, você vê links e preços de voos e ônibus; sem destino, a IA sugere para onde ir.</p>
         </div>
-      ) : (
+      ) : !plan.destination.trim() ? (
+        <Discover trip={trip} plan={plan} set={set} onAdd={addToItinerary} />
+      ) : !ready ? null : (
         <>
           <section className="panel ai-panel">
             <header className="row between">
@@ -155,20 +150,7 @@ export default function Tickets({ trip }: { trip: Trip }) {
               )}
             </header>
 
-            {(!key || showKey) && (
-              <div className="api-key">
-                <p className="small">
-                  Cole sua chave gratuita do Gemini. Crie em{" "}
-                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">aistudio.google.com/apikey</a>.
-                  Ela fica salva só neste navegador.
-                </p>
-                <div className="row">
-                  <input type="password" value={keyDraft} onChange={(e) => setKeyDraft(e.target.value)} placeholder={key ? "••••••••  (salva)" : "Chave da API do Gemini"} />
-                  <button className="btn primary" onClick={saveKey} disabled={!keyDraft.trim()}>Salvar</button>
-                  {key && <button className="btn" onClick={() => { setApiKey(""); setKey(""); }}>Remover</button>}
-                </div>
-              </div>
-            )}
+            {(!key || showKey) && <ApiKeyBox hasKey={!!key} onChange={(k) => { setKey(k); setShowKey(false); }} />}
 
             {loading && <div className="ai-loading"><span className="spinner" /> Pesquisando voos e ônibus… pode levar até 1 minuto.</div>}
             {error && <p className="bad small">⚠️ {error}</p>}
@@ -182,9 +164,9 @@ export default function Tickets({ trip }: { trip: Trip }) {
                   </p>
                 )}
                 <div className="chips">
-                  {(["todos", "aviao", "onibus", "outro"] as const).map((m) => (
+                  {(["todos", "aviao", "onibus", "carro", "outro"] as const).map((m) => (
                     <button key={m} className={`chip ${filter === m ? "on" : ""}`} style={{ "--c": "var(--accent)" } as React.CSSProperties} onClick={() => setFilter(m)}>
-                      {m === "todos" ? "Todos" : `${MODE_ICON[m]} ${m === "aviao" ? "Avião" : m === "onibus" ? "Ônibus" : "Outros"}`}
+                      {m === "todos" ? "Todos" : `${MODE_ICON[m]} ${({ aviao: "Avião", onibus: "Ônibus", carro: "Carro", outro: "Outros" })[m]}`}
                     </button>
                   ))}
                 </div>
