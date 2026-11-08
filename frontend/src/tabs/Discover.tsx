@@ -3,14 +3,15 @@ import { toast, updateTrip } from "../store";
 import type { AiOption, Destination, Trip, TransportPlan } from "../types";
 import { discoverWithGemini, getApiKey } from "../gemini";
 import ApiKeyBox from "../components/ApiKeyBox";
+import { fmtRange } from "../utils";
 
 export const MODE_ICON: Record<AiOption["mode"], string> = { aviao: "✈️", onibus: "🚌", carro: "🚗", outro: "🧭" };
 const MODE_LABEL: Record<AiOption["mode"], string> = { aviao: "Avião", onibus: "Ônibus", carro: "Carro", outro: "Outro" };
 
 const EXAMPLES = [
   "Praia tranquila, até 6 horas de viagem, gastando no máximo R$ 1.500 por pessoa",
-  "Cidade fria na serra com bons restaurantes e vinho, fim de semana",
-  "Primeira viagem internacional barata na América do Sul",
+  "Fim de semana que vem, serra fria com vinho, eu e minha esposa",
+  "Férias de julho, 10 dias, primeira viagem internacional barata",
   "Natureza, trilhas e cachoeiras, dá para ir de carro",
 ];
 
@@ -39,7 +40,19 @@ export default function Discover({ trip, plan, set, onAdd }: Props) {
     set({ wish });
     try {
       const discover = await discoverWithGemini(plan, wish.trim(), key, ctrl.signal);
-      set({ discover, wish });
+      const d = discover.dates;
+      const patch: Partial<TransportPlan> = { discover, wish };
+      if (d?.fromText) {
+        patch.departDate = d.departDate;
+        patch.returnDate = d.returnDate || plan.returnDate;
+        patch.oneWay = !d.returnDate && plan.oneWay;
+        if (d.passengers) patch.passengers = d.passengers;
+        // Ajusta as datas da viagem se o roteiro ainda estiver vazio
+        if (!trip.activities.some((a) => a.date)) {
+          updateTrip(trip.id, (t) => ({ ...t, startDate: d.departDate, endDate: d.returnDate || d.departDate }), false);
+        }
+      }
+      set(patch);
       setOpen(0);
       toast(`${discover.destinations.length} destinos sugeridos`);
     } catch (e) {
@@ -76,7 +89,7 @@ export default function Discover({ trip, plan, set, onAdd }: Props) {
             value={wish}
             onChange={(e) => setWish(e.target.value)}
             onKeyDown={(e) => (e.ctrlKey || e.metaKey) && e.key === "Enter" && run()}
-            placeholder="Ex.: quero uma praia tranquila, sem muita gente, até 6 h de viagem, gastando até R$ 1.500 por pessoa"
+            placeholder="Ex.: eu e minha namorada no carnaval, praia tranquila até 6 h de viagem, até R$ 1.500 cada"
           />
           <div className="chips">
             {EXAMPLES.map((ex) => (
@@ -91,11 +104,18 @@ export default function Discover({ trip, plan, set, onAdd }: Props) {
         </>
       )}
 
-      {loading && <div className="ai-loading"><span className="spinner" /> Pesquisando destinos e como chegar… pode levar de 1 a 2 minutos.</div>}
+      {loading && <div className="ai-loading"><span className="spinner" /> Pesquisando destinos e como chegar… pode levar de 1 a 3 minutos.</div>}
       {error && <p className="bad small">⚠️ {error}</p>}
 
       {result && !loading && (
         <div className="ai-result">
+          {result.dates?.fromText && (
+            <p className="dates-note">
+              📅 Entendi do seu texto: <b>{fmtRange(result.dates.departDate, result.dates.returnDate)}</b>
+              {result.dates.passengers ? <> · <b>{result.dates.passengers} pessoa{result.dates.passengers > 1 ? "s" : ""}</b></> : null}
+              {result.dates.note && <span className="muted"> ({result.dates.note})</span>}
+            </p>
+          )}
           {result.summary && <p className="ai-summary">{result.summary}</p>}
           <div className="dest-list">
             {result.destinations.map((d, i) => {

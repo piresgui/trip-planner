@@ -66,6 +66,8 @@ export interface DiscoverResult {
   summary: string;
   destinations: Destination[];
   tips: string[];
+  /** Datas/pessoas que a IA entendeu do texto */
+  dates?: { departDate: string; returnDate: string; passengers?: number; fromText: boolean; note: string };
   sources: { title: string; uri: string }[];
 }
 

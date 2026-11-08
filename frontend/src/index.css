@@ -530,3 +530,5 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 .options li, .link-list a, .dest { border-radius: 16px; background: rgb(255 255 255 / 70%); }
 .options li.best { background: linear-gradient(120deg, rgb(15 169 104 / 10%), rgb(0 194 255 / 8%)); }
 .chip { background: rgb(255 255 255 / 80%); }
+
+.dates-note { margin: 0; padding: 10px 14px; border-radius: 14px; background: rgb(15 169 104 / 10%); font-size: .9rem; }

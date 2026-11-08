@@ -91,8 +91,8 @@ export default function TripFormModal({ initial, onClose, onSave }: Props) {
         {help ? (
           <label>
             Como você imagina essa viagem?
-            <textarea autoFocus rows={3} value={wish} onChange={(e) => setWish(e.target.value)} placeholder="Ex.: praia tranquila, até 6 h de viagem, gastando até R$ 1.500 por pessoa" />
-            <small className="muted">A IA sugere destinos e como chegar de avião, ônibus ou carro.</small>
+            <textarea autoFocus rows={3} value={wish} onChange={(e) => setWish(e.target.value)} placeholder="Ex.: no carnaval, eu e minha namorada, praia tranquila até 6 h de viagem, até R$ 1.500 cada" />
+            <small className="muted">Pode escrever quando e com quem vai: a IA entende as datas e as pessoas e sugere destinos e como chegar.</small>
           </label>
         ) : (
           <label>
