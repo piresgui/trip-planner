@@ -7,10 +7,12 @@ import Itinerary from "../tabs/Itinerary";
 import Expenses from "../tabs/Expenses";
 import Checklist from "../tabs/Checklist";
 import Notes from "../tabs/Notes";
+import Tickets from "../tabs/Tickets";
 import { countdown, daysBetween, downloadJson, fmtRange } from "../utils";
 
 export const TABS = [
   { key: "geral", label: "Visão geral", icon: "✨" },
+  { key: "passagens", label: "Passagens", icon: "🎫" },
   { key: "roteiro", label: "Roteiro", icon: "🗓️" },
   { key: "gastos", label: "Gastos", icon: "💸" },
   { key: "checklist", label: "Checklist", icon: "✅" },
@@ -106,6 +108,7 @@ export default function TripPage() {
 
       <main className="tab-content" key={tab}>
         {tab === "geral" && <Overview trip={trip} goTab={goTab} />}
+        {tab === "passagens" && <Tickets trip={trip} />}
         {tab === "roteiro" && <Itinerary trip={trip} />}
         {tab === "gastos" && <Expenses trip={trip} />}
         {tab === "checklist" && <Checklist trip={trip} />}

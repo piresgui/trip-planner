@@ -22,6 +22,8 @@ export default function Overview({ trip, goTab }: { trip: Trip; goTab: (k: TabKe
   if (!trip.activities.length) tips.push({ text: "Comece o roteiro adicionando as primeiras atividades", tab: "roteiro" });
   else if (emptyDays.length) tips.push({ text: `${emptyDays.length} dia(s) ainda sem nada planejado`, tab: "roteiro" });
   if (ideas > 0) tips.push({ text: `${ideas} ideia(s) aguardando um dia no roteiro`, tab: "roteiro" });
+  if (!trip.transport?.ai && !trip.activities.some((a) => a.category === "transporte"))
+    tips.push({ text: "Compare passagens de avião e ônibus mais baratas", tab: "passagens" });
   if (trip.travelers.length < 2) tips.push({ text: "Adicione quem vai junto para dividir os gastos", tab: "gastos" });
   if (!trip.checklist.length) tips.push({ text: "Crie a checklist da mala com os itens básicos", tab: "checklist" });
   else if (checkDone < trip.checklist.length) tips.push({ text: `${trip.checklist.length - checkDone} item(ns) da checklist pendentes`, tab: "checklist" });

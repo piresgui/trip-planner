@@ -10,6 +10,9 @@ Planejador de viagens **100% local**: nada de servidor, banco de dados ou hosped
   - Adição rápida: digite `14h Museu do Prado` e o horário já é preenchido; a categoria é sugerida automaticamente.
   - Filtro por categoria, custo por dia, botão para organizar o dia por horário e link do local no Google Maps.
 - **Visão geral**: contagem regressiva, progresso do planejamento, resumo dia a dia, próximos passos sugeridos e o que vem a seguir.
+- **Passagens**: informe origem, destino e datas e veja links de busca prontos no Google Flights, Skyscanner, Kayak, Decolar, Momondo, LATAM e ClickBus, além de GOL, Azul, milhas, outros sites de ônibus, carona e carro.
+  - **Pesquisa com IA (opcional)**: com uma chave gratuita do Gemini ([aistudio.google.com/apikey](https://aistudio.google.com/apikey)), o app pesquisa no Google as opções mais baratas de avião e ônibus, com preço, duração, link e dicas da rota. A chave fica só no navegador. Cada opção pode ser enviada para o roteiro.
+  - Dicas gerais para pagar menos.
 - **Gastos**: orçamento × gasto × previsto, divisão entre os viajantes, saldos e o **mínimo de transferências** para acertar as contas, além do gasto por categoria.
 - **Checklist da mala**: grupos, itens básicos prontos e progresso.
 - **Notas** com salvamento automático.

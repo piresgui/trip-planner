@@ -31,6 +31,35 @@ export interface ChecklistItem {
   group: string;
 }
 
+export interface AiOption {
+  mode: "aviao" | "onibus" | "outro";
+  company: string;
+  route: string;
+  price: string;
+  priceValue: number;
+  duration: string;
+  details: string;
+  url: string;
+}
+
+export interface AiResult {
+  at: number;
+  summary: string;
+  options: AiOption[];
+  tips: string[];
+  sources: { title: string; uri: string }[];
+}
+
+export interface TransportPlan {
+  origin: string;
+  destination: string;
+  departDate: string;
+  returnDate: string;
+  oneWay: boolean;
+  passengers: number;
+  ai?: AiResult;
+}
+
 export interface Trip {
   id: string;
   title: string;
@@ -46,6 +75,7 @@ export interface Trip {
   expenses: Expense[];
   checklist: ChecklistItem[];
   notes: string;
+  transport?: TransportPlan;
   createdAt: number;
   updatedAt: number;
 }

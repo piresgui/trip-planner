@@ -100,6 +100,7 @@ export function normalizeTrip(t: Partial<Trip>): Trip {
     expenses: t.expenses ?? [],
     checklist: t.checklist ?? [],
     notes: t.notes ?? "",
+    transport: t.transport,
     createdAt: t.createdAt || Date.now(),
     updatedAt: t.updatedAt || Date.now(),
   };
