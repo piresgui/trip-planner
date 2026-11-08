@@ -51,7 +51,7 @@ export default function TripsPage() {
       <section className="hero">
         <div>
           <h1>Para onde vamos?</h1>
-          <p className="muted">Planeje roteiros dia a dia, controle gastos e não esqueça nada na mala. Tudo fica salvo neste navegador.</p>
+          <p className="muted">Diga para onde quer ir, ou conte como imagina a viagem e a IA escolhe o destino, as passagens e o roteiro.</p>
         </div>
         <button className="btn primary lg" onClick={() => setCreating(true)}>＋ Nova viagem</button>
       </section>
@@ -59,8 +59,8 @@ export default function TripsPage() {
       {trips.length === 0 ? (
         <div className="empty big">
           <div className="empty-emoji">🗺️</div>
-          <h2>Nenhuma viagem ainda</h2>
-          <p className="muted">Crie a primeira ou explore um exemplo pronto pra ver como funciona.</p>
+          <h2>Sua próxima viagem começa aqui</h2>
+          <p className="muted">Não sabe para onde ir? Clique em Criar viagem e escolha <b>Me ajude a escolher</b>.</p>
           <div className="row center">
             <button className="btn primary" onClick={() => setCreating(true)}>Criar viagem</button>
             <button className="btn" onClick={() => navigate(`/trips/${createSampleTrip().id}`)}>Ver exemplo</button>
@@ -93,7 +93,7 @@ export default function TripsPage() {
           onSave={(data) => {
             const t = createTrip(data);
             setCreating(false);
-            navigate(`/trips/${t.id}?tab=roteiro`);
+            navigate(`/trips/${t.id}?tab=${t.transport?.wish || t.transport?.origin ? "passagens" : "roteiro"}`);
           }}
         />
       )}

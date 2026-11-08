@@ -1,35 +1,22 @@
 :root {
-  --bg: #f6f7fb;
-  --surface: #ffffff;
-  --surface-2: #f1f3f9;
-  --border: #e3e6ef;
-  --text: #1c2033;
-  --muted: #6b7189;
-  --primary: #4f46e5;
+  --bg: #f4f6fc;
+  --surface: rgb(255 255 255 / 78%);
+  --surface-solid: #ffffff;
+  --surface-2: #eef1fb;
+  --border: rgb(120 130 180 / 18%);
+  --text: #141833;
+  --muted: #646b8c;
+  --primary: #5b4bff;
   --primary-ink: #ffffff;
-  --good: #059669;
-  --bad: #dc2626;
-  --accent: #6366f1;
-  --radius: 14px;
-  --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 4px 16px rgb(16 24 40 / 6%);
-  --shadow-lg: 0 20px 50px rgb(16 24 40 / 20%);
+  --grad: linear-gradient(120deg, #5b4bff 0%, #8b5cf6 45%, #00c2ff 100%);
+  --good: #0fa968;
+  --bad: #e5484d;
+  --accent: #5b4bff;
+  --radius: 20px;
+  --shadow: 0 1px 1px rgb(20 24 60 / 4%), 0 10px 30px -12px rgb(60 60 140 / 18%);
+  --shadow-lg: 0 30px 70px -20px rgb(60 50 160 / 35%);
+  --glow: 0 0 0 1px rgb(255 255 255 / 70%) inset, 0 12px 40px -18px rgb(91 75 255 / 45%);
   color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f1220;
-    --surface: #181c2e;
-    --surface-2: #20253b;
-    --border: #2c3250;
-    --text: #e8eaf4;
-    --muted: #959bb8;
-    --primary: #818cf8;
-    --primary-ink: #0f1220;
-    --good: #34d399;
-    --bad: #f87171;
-    --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 16px rgb(0 0 0 / 25%);
-    color-scheme: dark;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -432,3 +419,114 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--good); c
   .dest-head { flex-wrap: wrap; }
   .dest-price { width: 100%; padding-left: 46px; }
 }
+
+
+/* =========================================================
+   Visual claro e futurista: vidro, aurora e gradientes
+   ========================================================= */
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(900px 600px at 0% -10%, rgb(124 108 255 / 22%), transparent 60%),
+    radial-gradient(800px 600px at 100% 0%, rgb(0 194 255 / 18%), transparent 60%),
+    radial-gradient(700px 500px at 50% 110%, rgb(255 120 200 / 12%), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+  background-image: linear-gradient(rgb(91 75 255 / 5%) 1px, transparent 1px), linear-gradient(90deg, rgb(91 75 255 / 5%) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at 50% 0%, #000 30%, transparent 75%);
+}
+h1, h2, h3, .brand { font-family: "Space Grotesk", "Inter", system-ui, sans-serif; letter-spacing: -.02em; }
+
+/* Superfícies de vidro */
+.panel, .stat, .trip-card, .modal, .menu, .column, .empty.big, .dest, .options li, .link-list a {
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+}
+.panel, .stat { border: 1px solid rgb(255 255 255 / 80%); box-shadow: var(--glow); }
+.modal, .menu { background: rgb(255 255 255 / 92%); border: 1px solid rgb(255 255 255 / 90%); }
+.modal { border-radius: 26px; }
+.modal-backdrop { background: rgb(30 30 70 / 25%); backdrop-filter: blur(8px); }
+.modal-header h2 { font-size: 1.5rem; }
+.modal-footer { border-top: 0; }
+
+/* Botões */
+.btn { border-radius: 14px; font-weight: 600; background: var(--surface-solid); }
+.btn.primary {
+  background: var(--grad); background-size: 200% 100%; border: 0; color: #fff;
+  box-shadow: 0 10px 30px -10px rgb(91 75 255 / 70%), 0 0 0 1px rgb(255 255 255 / 25%) inset;
+  transition: background-position .4s, transform .15s, box-shadow .2s;
+}
+.btn.primary:hover { background-position: 100% 0; filter: none; box-shadow: 0 14px 36px -10px rgb(0 160 255 / 70%); }
+.btn.lg { padding: 15px 26px; border-radius: 16px; font-size: 1.02rem; }
+.btn.ghost { background: transparent; }
+.link { color: var(--primary); font-weight: 600; }
+
+/* Campos */
+input:not([type="checkbox"]), select, textarea {
+  background: rgb(255 255 255 / 85%); border-radius: 14px; padding: 12px 14px; border-color: rgb(120 130 180 / 25%);
+}
+input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgb(91 75 255 / 14%); }
+.form label, .field { font-size: .88rem; font-weight: 600; color: var(--text); }
+
+/* Topo e hero da lista */
+.topbar { padding: 22px 0; }
+.brand-logo {
+  width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; font-size: 1.2rem;
+  background: var(--grad); box-shadow: 0 8px 20px -8px rgb(91 75 255 / 70%);
+}
+.hero { padding: 40px 0 34px; }
+.hero h1 {
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem); line-height: 1.05;
+  background: linear-gradient(120deg, #141833 20%, #5b4bff 60%, #00a6e0); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero p { font-size: 1.05rem; }
+.section-title { color: var(--primary); }
+
+/* Cartões de viagem */
+.trip-card { border-radius: 24px; border: 1px solid rgb(255 255 255 / 85%); background: var(--surface); box-shadow: var(--glow); }
+.trip-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.trip-card-cover {
+  height: 130px;
+  background:
+    radial-gradient(circle at 80% 20%, rgb(255 255 255 / 45%), transparent 45%),
+    linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #ffffff));
+}
+.progress { background: rgb(91 75 255 / 10%); }
+.progress > div { background: linear-gradient(90deg, var(--accent), #00c2ff); }
+.empty.big { background: var(--surface); border: 1px solid rgb(255 255 255 / 85%); box-shadow: var(--glow); border-radius: 28px; }
+
+/* Página da viagem */
+.trip-hero {
+  margin: 14px max(14px, calc((100vw - 1260px) / 2)) 0; border-radius: 28px; padding: 14px 24px 0; position: relative;
+  background:
+    radial-gradient(600px 300px at 90% -20%, rgb(255 255 255 / 35%), transparent 60%),
+    linear-gradient(130deg, var(--accent), color-mix(in srgb, var(--accent) 62%, #ffffff));
+  box-shadow: 0 30px 60px -30px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.tabs { padding-bottom: 12px; gap: 6px; }
+.tabs button { border-radius: 14px; padding: 10px 16px; background: rgb(255 255 255 / 14%); }
+.tabs button.active { background: #fff; color: var(--text); box-shadow: 0 8px 20px -8px rgb(0 0 0 / 30%); }
+.pill { backdrop-filter: blur(8px); }
+
+/* Seletor "Já sei / Me ajude" */
+.segmented { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 5px; border-radius: 16px; background: var(--surface-2); }
+.segmented button {
+  border: 0; background: transparent; padding: 12px 10px; border-radius: 12px; cursor: pointer; font-weight: 600; color: var(--muted);
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+.segmented button.on { background: #fff; color: var(--text); box-shadow: 0 6px 18px -8px rgb(91 75 255 / 55%); }
+.segmented button:last-child.on { background: var(--grad); color: #fff; }
+.more-toggle { border: 0; background: none; text-align: left; padding: 4px 0; cursor: pointer; font-weight: 600; color: var(--primary); }
+.more { display: flex; flex-direction: column; gap: 14px; padding: 14px; border-radius: 16px; background: var(--surface-2); }
+.trip-preview { border-radius: 18px; background: radial-gradient(circle at 85% 10%, rgb(255 255 255 / 40%), transparent 45%), linear-gradient(130deg, var(--accent), color-mix(in srgb, var(--accent) 62%, #ffffff)); }
+
+/* IA */
+.ai-panel { border: 1px solid transparent; background: linear-gradient(var(--surface-solid), var(--surface-solid)) padding-box, var(--grad) border-box; }
+.ai-summary { background: linear-gradient(120deg, rgb(91 75 255 / 8%), rgb(0 194 255 / 8%)); border-left: 0; border-radius: 14px; }
+.options li, .link-list a, .dest { border-radius: 16px; background: rgb(255 255 255 / 70%); }
+.options li.best { background: linear-gradient(120deg, rgb(15 169 104 / 10%), rgb(0 194 255 / 8%)); }
+.chip { background: rgb(255 255 255 / 80%); }

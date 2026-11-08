@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast, updateTrip } from "../store";
 import type { AiOption, Destination, Trip, TransportPlan } from "../types";
 import { discoverWithGemini, getApiKey } from "../gemini";
@@ -33,21 +33,27 @@ export default function Discover({ trip, plan, set, onAdd }: Props) {
   async function run() {
     if (!key || !wish.trim()) return;
     abort.current?.abort();
-    abort.current = new AbortController();
+    const ctrl = (abort.current = new AbortController());
     setLoading(true);
     setError("");
     set({ wish });
     try {
-      const discover = await discoverWithGemini(plan, wish.trim(), key, abort.current.signal);
+      const discover = await discoverWithGemini(plan, wish.trim(), key, ctrl.signal);
       set({ discover, wish });
       setOpen(0);
       toast(`${discover.destinations.length} destinos sugeridos`);
     } catch (e) {
       if ((e as Error).name !== "AbortError") setError((e as Error).message || "Falha na pesquisa");
     } finally {
-      setLoading(false);
+      if (abort.current === ctrl) setLoading(false);
     }
   }
+
+  // Veio do "Me ajude a escolher" ao criar a viagem: pesquisa sozinho.
+  useEffect(() => {
+    if (key && plan.wish && !plan.discover) run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function choose(d: Destination) {
     set({ destination: d.name });

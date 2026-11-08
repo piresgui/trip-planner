@@ -39,17 +39,17 @@ export default function Tickets({ trip }: { trip: Trip }) {
   async function runAi() {
     if (!key || !ready) return;
     abort.current?.abort();
-    abort.current = new AbortController();
+    const ctrl = (abort.current = new AbortController());
     setLoading(true);
     setError("");
     try {
-      const ai = await searchWithGemini(plan, key, abort.current.signal);
+      const ai = await searchWithGemini(plan, key, ctrl.signal);
       set({ ai });
       toast(`${ai.options.length} opções encontradas`);
     } catch (e) {
       if ((e as Error).name !== "AbortError") setError((e as Error).message || "Falha na pesquisa");
     } finally {
-      setLoading(false);
+      if (abort.current === ctrl) setLoading(false);
     }
   }
 

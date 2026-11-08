@@ -24,6 +24,10 @@ export default function TripFormModal({ initial, onClose, onSave }: Props) {
   const [currency, setCurrency] = useState(initial?.currency ?? "BRL");
   const [budget, setBudget] = useState(initial?.budget ? String(initial.budget) : "");
   const [travelers, setTravelers] = useState<string[]>(initial?.travelers ?? ["Eu"]);
+  const [origin, setOrigin] = useState(initial?.transport?.origin ?? "");
+  const [help, setHelp] = useState(false);
+  const [wish, setWish] = useState("");
+  const [more, setMore] = useState(!!initial);
 
   const invalid = endDate < startDate;
   const nights = invalid ? 0 : diffDays(startDate, endDate);
@@ -31,9 +35,22 @@ export default function TripFormModal({ initial, onClose, onSave }: Props) {
   function submit(e: FormEvent) {
     e.preventDefault();
     if (invalid) return;
+    const dest = help ? "" : destination.trim();
     onSave({
-      title: title.trim() || destination.trim() || "Nova viagem",
-      destination: destination.trim(),
+      title: title.trim() || dest || (help ? "Viagem surpresa" : "Nova viagem"),
+      destination: dest,
+      transport: origin.trim() || help
+        ? {
+            ...(initial?.transport ?? {}),
+            origin: origin.trim(),
+            destination: dest,
+            departDate: startDate,
+            returnDate: endDate,
+            oneWay: false,
+            passengers: Math.max(1, travelers.length),
+            ...(help ? { wish: wish.trim(), discover: undefined } : {}),
+          }
+        : initial?.transport,
       startDate,
       endDate,
       emoji,
@@ -51,7 +68,7 @@ export default function TripFormModal({ initial, onClose, onSave }: Props) {
       footer={
         <>
           <button type="button" className="btn ghost" onClick={onClose}>Cancelar</button>
-          <button type="submit" form="trip-form" className="btn primary" disabled={invalid}>
+          <button type="submit" form="trip-form" className="btn primary" disabled={invalid || (help && (!wish.trim() || !origin.trim()))}>
             {initial ? "Salvar" : "Criar viagem"}
           </button>
         </>
@@ -61,18 +78,31 @@ export default function TripFormModal({ initial, onClose, onSave }: Props) {
         <div className="trip-preview" style={{ "--accent": color } as React.CSSProperties}>
           <span className="trip-preview-emoji">{emoji}</span>
           <div>
-            <strong>{title || destination || "Minha viagem"}</strong>
+            <strong>{title || (help ? "Viagem surpresa ✨" : destination) || "Minha viagem"}</strong>
             <small>{nights + 1} dia{nights ? "s" : ""} · {nights} noite{nights === 1 ? "" : "s"}</small>
           </div>
         </div>
 
+        <div className="segmented" role="radiogroup" aria-label="Destino">
+          <button type="button" role="radio" aria-checked={!help} className={!help ? "on" : ""} onClick={() => setHelp(false)}>📍 Já sei para onde</button>
+          <button type="button" role="radio" aria-checked={help} className={help ? "on" : ""} onClick={() => setHelp(true)}>✨ Me ajude a escolher</button>
+        </div>
+
+        {help ? (
+          <label>
+            Como você imagina essa viagem?
+            <textarea autoFocus rows={3} value={wish} onChange={(e) => setWish(e.target.value)} placeholder="Ex.: praia tranquila, até 6 h de viagem, gastando até R$ 1.500 por pessoa" />
+            <small className="muted">A IA sugere destinos e como chegar de avião, ônibus ou carro.</small>
+          </label>
+        ) : (
+          <label>
+            Para onde?
+            <input autoFocus value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Ex.: Buenos Aires, Argentina" />
+          </label>
+        )}
         <label>
-          Destino
-          <input autoFocus value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="Ex.: Buenos Aires, Argentina" />
-        </label>
-        <label>
-          Nome da viagem <span className="muted">(opcional)</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Férias de julho" />
+          De onde você sai? {!help && <span className="muted">(opcional)</span>}
+          <input value={origin} onChange={(e) => setOrigin(e.target.value)} placeholder="Ex.: Itajaí, SC" required={help} />
         </label>
         <div className="row">
           <label>
@@ -91,6 +121,20 @@ export default function TripFormModal({ initial, onClose, onSave }: Props) {
         </div>
         {invalid && <p className="error">A volta precisa ser depois da ida.</p>}
 
+        <div className="field">
+          <span>Quem vai?</span>
+          <TravelersInput value={travelers} onChange={setTravelers} />
+        </div>
+
+        <button type="button" className="more-toggle" onClick={() => setMore((m) => !m)} aria-expanded={more}>
+          {more ? "▾" : "▸"} Mais opções <span className="muted">(nome, orçamento, ícone e cor)</span>
+        </button>
+        {more && (
+          <div className="more">
+        <label>
+          Nome da viagem <span className="muted">(opcional)</span>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Férias de julho" />
+        </label>
         <div className="row">
           <label>
             Moeda
@@ -102,11 +146,6 @@ export default function TripFormModal({ initial, onClose, onSave }: Props) {
             Orçamento total <span className="muted">(opcional)</span>
             <input inputMode="decimal" value={budget} onChange={(e) => setBudget(e.target.value)} placeholder="0,00" />
           </label>
-        </div>
-
-        <div className="field">
-          <span>Quem vai?</span>
-          <TravelersInput value={travelers} onChange={setTravelers} />
         </div>
 
         <div className="field">
@@ -125,6 +164,8 @@ export default function TripFormModal({ initial, onClose, onSave }: Props) {
             ))}
           </div>
         </div>
+          </div>
+        )}
       </form>
     </Modal>
   );
