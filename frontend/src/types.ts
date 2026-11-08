@@ -42,8 +42,21 @@ export interface AiOption {
   url: string;
 }
 
+export interface AiPackage {
+  name: string;
+  provider: string;
+  includes: string;
+  nights: number;
+  price: string;
+  priceValue: number;
+  details: string;
+  url: string;
+}
+
 export interface AiResult {
   at: number;
+  calendar?: { date: string; price: string; priceValue: number; mode: "aviao" | "onibus"; estimated?: boolean }[];
+  packages?: AiPackage[];
   summary: string;
   options: AiOption[];
   tips: string[];

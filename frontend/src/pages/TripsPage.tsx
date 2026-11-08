@@ -93,7 +93,7 @@ export default function TripsPage() {
           onSave={(data) => {
             const t = createTrip(data);
             setCreating(false);
-            navigate(`/trips/${t.id}?tab=${t.transport?.wish || t.transport?.origin ? "passagens" : "roteiro"}`);
+            navigate(`/trips/${t.id}?tab=passagens`);
           }}
         />
       )}

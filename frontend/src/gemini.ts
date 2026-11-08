@@ -1,5 +1,5 @@
-import { today } from "./utils";
-import type { AiOption, AiResult, Destination, DiscoverResult, TransportPlan } from "./types";
+import { addDays, diffDays, today } from "./utils";
+import type { AiOption, AiPackage, AiResult, Destination, DiscoverResult, TransportPlan } from "./types";
 
 /**
  * Pesquisa de passagens com a API gratuita do Gemini usando "grounding" com a Busca do Google.
@@ -26,6 +26,9 @@ export function setApiKey(key: string) {
 }
 
 function buildPrompt(p: TransportPlan): string {
+  const calStart = addDays(p.departDate, -3) < today() ? today() : addDays(p.departDate, -3);
+  const calEnd = addDays(calStart, 6);
+  const len = p.returnDate ? Math.max(0, diffDays(p.departDate, p.returnDate)) : 0;
   const trip = p.oneWay || !p.returnDate ? `somente ida em ${p.departDate}` : `ida em ${p.departDate} e volta em ${p.returnDate}`;
   return `Hoje é ${today()}. Você é um assistente de viagens no Brasil. Pesquise na web as opções MAIS BARATAS de transporte de "${p.origin}" para "${p.destination}", ${trip}, para ${p.passengers} passageiro(s).
 
@@ -35,6 +38,8 @@ Considere:
 - Carro: carro próprio (combustível + pedágios ida e volta para o grupo, url do Google Maps) e aluguel de carro, quando a distância permitir.
 - Carona (BlaBlaCar) e combinações (ex.: ônibus até um aeroporto maior + voo) quando puderem sair mais baratas.
 - Vários horários e várias companhias/viações: cada companhia, viação, aeroporto alternativo ou combinação é uma opção separada.
+- PACOTES prontos (passagem + hospedagem) para esse destino e período: Decolar, CVC, Hurb, Azul Viagens, LATAM Travel, Smiles Viagens, 123milhas, MaxMilhas, Booking e agências locais.
+- CALENDÁRIO: o preço mais barato de ida e volta por pessoa saindo em cada dia de ${calStart} a ${calEnd}${p.oneWay || !p.returnDate ? "" : `, mantendo ${len} noite(s) de viagem`} (como o gráfico de datas do Google Flights). Preencha TODOS os 7 dias com um valor numérico: se não achar o preço exato de um dia, estime pelo preço típico da rota e pelo dia da semana (sexta e domingo mais caros) e marque "estimated": true. Nunca escreva "verificar".
 
 Responda APENAS com um bloco \`\`\`json contendo:
 {
@@ -51,9 +56,15 @@ Responda APENAS com um bloco \`\`\`json contendo:
       "url": "link da página onde comprar ou pesquisar esta opção"
     }
   ],
+  "calendar": [
+    { "date": "AAAA-MM-DD (data de ida)", "priceValue": número por pessoa (mais barato do dia, avião ou ônibus), "mode": "aviao" | "onibus", "estimated": true | false }
+  ],
+  "packages": [
+    { "name": "nome do pacote", "provider": "Decolar, CVC, Hurb…", "includes": "o que inclui (voo, hotel, café, transfer…)", "nights": número de noites, "price": "preço por pessoa", "priceValue": número por pessoa, "details": "hotel, datas, observações", "url": "link do pacote ou da busca de pacotes do site" }
+  ],
   "tips": ["dicas específicas desta rota e destas datas para economizar"]
 }
-Ordene "options" do mais barato para o mais caro e traga O MÁXIMO de opções que encontrar (idealmente 12 a 20), cobrindo todos os meios de transporte viáveis. Use apenas preços que você encontrou na pesquisa; se forem estimativas, deixe claro em "price". Escreva texto puro, sem markdown. Não invente links: se não tiver a página exata, use a página de busca do site. Links: curtos (até 200 caracteres), sem repetir trechos; prefira a página da rota ou a busca do site.`;
+Ordene "options" do mais barato para o mais caro e traga O MÁXIMO de opções que encontrar (até 15), cobrindo todos os meios de transporte viáveis. Mínimos: 5 voos diferentes (companhias, aeroportos e horários) se houver aeroporto por perto, 3 ônibus se a rota existir por terra, carro próprio se for até ~1.200 km, e 3 pacotes em "packages". Use apenas preços que você encontrou na pesquisa; se forem estimativas, deixe claro em "price". Escreva texto puro, sem markdown. Não invente links: se não tiver a página exata, use a página de busca do site. Links: curtos (até 200 caracteres), sem repetir trechos; prefira a página da rota ou a busca do site.`;
 }
 
 interface GeminiResponse {
@@ -108,6 +119,8 @@ export function parseJson(text: string): any {
       summary: str("summary"),
       options: salvageArray(text, "options"),
       destinations: salvageArray(text, "destinations"),
+      calendar: salvageArray(text, "calendar"),
+      packages: salvageArray(text, "packages"),
       tips: [],
       dates: salvageObject(text, "dates"),
       truncated: true,
@@ -168,7 +181,21 @@ function toOptions(list: unknown): AiOption[] {
 export async function searchWithGemini(p: TransportPlan, apiKey: string, signal?: AbortSignal): Promise<AiResult> {
   const { parsed, sources } = await callGemini(buildPrompt(p), apiKey, signal);
   if (parsed.truncated && !parsed.options?.length) throw new Error("A resposta da IA veio incompleta. Tente de novo.");
+  const ISO_D = /^\d{4}-\d{2}-\d{2}$/;
+  const calendar = (Array.isArray(parsed.calendar) ? parsed.calendar : [])
+    .filter((c: any) => ISO_D.test(c?.date))
+    .map((c: any) => ({ date: c.date, price: clean(c.price), priceValue: Number(c.priceValue) || 0, mode: c.mode === "onibus" ? "onibus" : "aviao", estimated: !!c.estimated }))
+    .sort((a: any, b: any) => a.date.localeCompare(b.date));
+  const packages: AiPackage[] = (Array.isArray(parsed.packages) ? parsed.packages : [])
+    .map((k: any) => ({
+      name: clean(k?.name), provider: clean(k?.provider), includes: clean(k?.includes), nights: Number(k?.nights) || 0,
+      price: clean(k?.price), priceValue: Number(k?.priceValue) || 0, details: clean(k?.details), url: safeUrl(k?.url),
+    }))
+    .filter((k: AiPackage) => k.name || k.provider)
+    .sort((a: AiPackage, b: AiPackage) => (a.priceValue || Infinity) - (b.priceValue || Infinity));
   return {
+    calendar,
+    packages,
     at: Date.now(),
     summary: clean(parsed.summary),
     options: toOptions(parsed.options),

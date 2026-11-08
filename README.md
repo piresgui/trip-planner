@@ -10,10 +10,12 @@ Planejador de viagens **100% local**: nada de servidor, banco de dados ou hosped
   - Adição rápida: digite `14h Museu do Prado` e o horário já é preenchido; a categoria é sugerida automaticamente.
   - Filtro por categoria, custo por dia, botão para organizar o dia por horário e link do local no Google Maps.
 - **Visão geral**: contagem regressiva, progresso do planejamento, resumo dia a dia, próximos passos sugeridos e o que vem a seguir.
-- **Passagens**: informe origem, destino e datas e veja links de busca prontos no Google Flights, Skyscanner, Kayak, Decolar, Momondo, LATAM e ClickBus, além de GOL, Azul, milhas, outros sites de ônibus, carona e carro.
-  - **Pesquisa com IA (opcional)**: com uma chave gratuita do Gemini ([aistudio.google.com/apikey](https://aistudio.google.com/apikey)), o app pesquisa no Google as opções mais baratas de avião e ônibus, com preço, duração, link e dicas da rota. A chave fica só no navegador. Cada opção pode ser enviada para o roteiro.
-  - **Não sabe para onde ir?** Deixe o destino vazio e descreva a viagem em linguagem natural (ex.: "praia tranquila até 6 h de viagem, até R$ 1.500"). O Gemini sugere destinos com o que fazer, clima, custo estimado e como chegar de avião, ônibus ou carro, com preços e links.
-  - Dicas gerais para pagar menos.
+- **Passagens** (estilo Google Flights): informe de onde sai (o app lembra) e a busca começa sozinha ao abrir a aba.
+  - **Calendário de preços**: o preço mais barato por pessoa em cada dia de ida (3 dias antes e depois); toque num dia para pesquisar de novo.
+  - Resultados separados em **Voos**, **Ônibus**, **Carro e outros** e **Pacotes** (passagem + hotel de Decolar, CVC, Hurb, Azul Viagens…), com link e botão para levar ao roteiro ou aos gastos.
+  - **Não sabe para onde ir?** Deixe o destino vazio e descreva a viagem em linguagem natural (ex.: "no carnaval, eu e minha namorada, praia tranquila"). A IA entende as datas e as pessoas e sugere destinos com como chegar de avião, ônibus ou carro.
+  - Links prontos para pesquisar direto no Google Flights, Skyscanner, Kayak, Decolar, companhias e rodoviárias.
+  - Usa a API gratuita do Gemini ([aistudio.google.com/apikey](https://aistudio.google.com/apikey)); a chave fica só no navegador.
 - **Gastos**: orçamento × gasto × previsto, divisão entre os viajantes, saldos e o **mínimo de transferências** para acertar as contas, além do gasto por categoria.
 - **Checklist da mala**: grupos, itens básicos prontos e progresso.
 - **Notas** com salvamento automático.

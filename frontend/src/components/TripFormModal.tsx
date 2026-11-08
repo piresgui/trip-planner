@@ -24,7 +24,7 @@ export default function TripFormModal({ initial, onClose, onSave }: Props) {
   const [currency, setCurrency] = useState(initial?.currency ?? "BRL");
   const [budget, setBudget] = useState(initial?.budget ? String(initial.budget) : "");
   const [travelers, setTravelers] = useState<string[]>(initial?.travelers ?? ["Eu"]);
-  const [origin, setOrigin] = useState(initial?.transport?.origin ?? "");
+  const [origin, setOrigin] = useState(() => initial?.transport?.origin ?? (() => { try { return localStorage.getItem("trip-planner:last-origin") ?? ""; } catch { return ""; } })());
   const [help, setHelp] = useState(false);
   const [wish, setWish] = useState("");
   const [more, setMore] = useState(!!initial);
